@@ -194,3 +194,30 @@ def load_model(filepath, custom_optimizers=None, custom_objects=None):
         horovod_objects.update(custom_objects)
 
     return keras.models.load_model(filepath, custom_objects=horovod_objects)
+
+
+def set_session(session):
+    """
+    Sets the Keras backend session to the session given.
+
+    This facilitates the using Horovod with the tf.keras implementation of Keras
+    by setting the Horovod Keras session ot the one used by tf.keras.
+
+    For example:
+
+    ```
+    from tensorflow.python.keras import backend as K
+    ...
+    hvd.init()
+    ...
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    config.gpu_options.visible_device_list = str(hvd.local_rank())
+    K.set_session(tf.Session(config=config))
+    hvd.set_session(K.get_session())
+    ```
+
+    # Arguments
+        session: The Keras session to assign to Horovod.
+    """
+    K.set_session(session)
